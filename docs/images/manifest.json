@@ -1,0 +1,8 @@
+{
+  "data": "synthetic examples only",
+  "apps": "fictional Example apps",
+  "domains": "RFC 2606 example domains",
+  "addresses": "RFC 5737 documentation ranges",
+  "locations": "illustrative fixture coordinates, not geolocation claims about documentation addresses",
+  "capture": "native EShield views rendered from isolated demo state; no real desktop or live connection capture"
+}

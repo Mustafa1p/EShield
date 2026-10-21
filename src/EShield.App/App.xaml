@@ -1,0 +1,31 @@
+<Application x:Class="EShield.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ui="http://schemas.modernwpf.com/2019"
+             xmlns:conv="clr-namespace:EShield.Converters"
+             ShutdownMode="OnExplicitShutdown">
+  <Application.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <ui:ThemeResources RequestedTheme="Dark"/>
+        <ui:XamlControlsResources/>
+        <ResourceDictionary Source="/EShield;component/Themes/DarkTheme.xaml"/>
+      </ResourceDictionary.MergedDictionaries>
+      <conv:BoolToVisibilityConverter              x:Key="BoolVis"/>
+      <conv:InverseBoolToVisibilityConverter       x:Key="InvBoolVis"/>
+      <conv:BlockedToColorConverter                x:Key="BlockColor"/>
+      <conv:BlockedToBadgeConverter                x:Key="BlockBadge"/>
+      <conv:ConnectionModeToColorConverter         x:Key="ModeColor"/>
+      <conv:ConnectionModeToStringConverter        x:Key="ModeStr"/>
+      <conv:IntToVisibilityConverter               x:Key="IntVis"/>
+      <conv:NullToVisibilityConverter              x:Key="NullVis"/>
+      <conv:InverseNullToVisibilityConverter       x:Key="InvNullVis"/>
+      <conv:ExpandArrowConverter                   x:Key="ExpandArrow"/>
+      <conv:DestinationForegroundConverter         x:Key="DestFore"/>
+      <conv:HighlightBrushConverter                x:Key="HighlightBrush"/>
+      <conv:NameToColorConverter                   x:Key="NameToColor"/>
+      <conv:InitialConverter                       x:Key="InitialConverter"/>
+      <conv:CountryFlagConverter                   x:Key="CountryFlag"/>
+    </ResourceDictionary>
+  </Application.Resources>
+</Application>

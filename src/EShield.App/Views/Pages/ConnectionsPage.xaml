@@ -1,0 +1,107 @@
+<UserControl x:Class="EShield.Views.Pages.ConnectionsPage"
+ xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+ xmlns:m="clr-namespace:EShield.Models" xmlns:ctrl="clr-namespace:EShield.Controls"
+ xmlns:pages="clr-namespace:EShield.Views.Pages" Loaded="Page_Loaded" Unloaded="Page_Unloaded">
+ <Grid>
+  <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+  <Border Background="#233322" Padding="12,8" Visibility="{Binding BlockedCount,Converter={StaticResource IntVis}}">
+   <DockPanel>
+    <Button DockPanel.Dock="Right" Style="{StaticResource SuccessButton}" Content="Unblock All" Padding="10,4" Command="{Binding UnblockAllCommand}"/>
+    <TextBlock Foreground="#86EFAC" VerticalAlignment="Center"><Run Text="{Binding BlockedCount}"/><Run Text=" app(s) with blocked connections"/></TextBlock>
+   </DockPanel>
+  </Border>
+  <pages:ApprovalPanelView Grid.Row="1" Visibility="{Binding IsApprovalPanelVisible,Converter={StaticResource BoolVis}}"/>
+  <StackPanel Grid.Row="2" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="20" Visibility="{Binding HasNoConnections,Converter={StaticResource BoolVis}}">
+   <TextBlock Text="No matching connections" FontSize="16" Foreground="{StaticResource TextBrush}" HorizontalAlignment="Center"/>
+   <TextBlock Text="Open an app or website, or adjust your search and time range." FontSize="12" TextWrapping="Wrap" Foreground="{StaticResource TextDimBrush}" Margin="0,8"/>
+  </StackPanel>
+  <ScrollViewer x:Name="ConnectionScroll" Grid.Row="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+   <ItemsControl x:Name="ProcessList" ItemsSource="{Binding FilteredProcesses}">
+    <ItemsControl.ItemTemplate>
+     <DataTemplate DataType="{x:Type m:NetworkProcess}">
+      <Border x:Name="AppBorder" Background="Transparent" BorderBrush="Transparent" BorderThickness="2,0,0,0" Margin="0,2">
+       <StackPanel>
+        <Button Style="{StaticResource ProcessRow}" Tag="{Binding}" Click="AppRow_Click" ContextMenuOpening="Row_ContextMenuOpening" ToolTip="{Binding ExecutablePath}">
+         <Button.ContextMenu><ContextMenu/></Button.ContextMenu>
+         <Grid>
+          <Grid.ColumnDefinitions><ColumnDefinition Width="20"/><ColumnDefinition Width="42"/><ColumnDefinition Width="*"/><ColumnDefinition Width="66"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+          <TextBlock Text="{Binding IsExpanded,Converter={StaticResource ExpandArrow}}" Foreground="{StaticResource TextDimBrush}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+          <Grid Grid.Column="1" Width="28" Height="28" HorizontalAlignment="Left">
+           <Image Source="{Binding AppIcon}" Stretch="Uniform" RenderOptions.BitmapScalingMode="HighQuality"/>
+           <Border CornerRadius="7" Visibility="{Binding AppIcon,Converter={StaticResource InvNullVis}}">
+            <Border.Background><SolidColorBrush Color="{Binding Name,Converter={StaticResource NameToColor}}"/></Border.Background>
+            <TextBlock Text="{Binding Name,Converter={StaticResource InitialConverter}}" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+           </Border>
+          </Grid>
+          <TextBlock Grid.Column="2" Text="{Binding Name}" FontSize="13.5" FontWeight="SemiBold" Foreground="{StaticResource TextBrush}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+          <ctrl:SparklineControl Grid.Column="3" Width="58" Height="16" Data="{Binding BandwidthSamples}" MouseLeftButtonDown="Sparkline_Click" Cursor="Hand" VerticalAlignment="Center"/>
+          <StackPanel Grid.Column="4" Orientation="Horizontal" VerticalAlignment="Center" Margin="8,0,0,0">
+           <Ellipse Width="7" Height="7" Fill="{Binding IsBlocked,Converter={StaticResource BlockColor}}" Margin="0,0,5,0"/>
+           <TextBlock Text="{Binding StatusText}" FontSize="11" Foreground="{StaticResource TextDimBrush}"/>
+          </StackPanel>
+         </Grid>
+        </Button>
+        <StackPanel Margin="38,0,12,6" Visibility="{Binding IsExpanded,Converter={StaticResource BoolVis}}">
+         <TextBlock Text="{Binding ExecutablePath}" FontSize="10" Foreground="{StaticResource TextDimBrush}" TextTrimming="CharacterEllipsis" ToolTip="{Binding ExecutablePath}"/>
+         <TextBlock Text="{Binding SignatureText}" FontSize="10" Foreground="{StaticResource TextDimBrush}" Margin="0,3,0,6"/>
+         <WrapPanel>
+          <Button Content="Block app" Style="{StaticResource DangerButton}" FontSize="11" Padding="8,4" Margin="0,0,6,0" Command="{Binding DataContext.BlockProcessCommand,RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}"/>
+          <Button Content="Unblock app" Style="{StaticResource GhostButton}" FontSize="11" Padding="8,4" Margin="0,0,6,0" Command="{Binding DataContext.UnblockProcessCommand,RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}"/>
+          <Button Content="Allow app" Style="{StaticResource GhostButton}" FontSize="11" Padding="8,4" Margin="0,0,6,0" Command="{Binding DataContext.AllowProcessCommand,RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}"/>
+          <Button Content="Show in Map" Style="{StaticResource GhostButton}" FontSize="11" Padding="8,4" Click="ShowMap_Click"/>
+         </WrapPanel>
+        </StackPanel>
+        <ItemsControl ItemsSource="{Binding Destinations}" Visibility="{Binding IsExpanded,Converter={StaticResource BoolVis}}">
+         <ItemsControl.ItemTemplate>
+          <DataTemplate DataType="{x:Type m:DestinationGroup}">
+           <StackPanel>
+            <Border x:Name="DestBorder" Background="Transparent" Padding="40,7,12,7" MouseLeftButtonDown="DestRow_Click" ContextMenuOpening="Row_ContextMenuOpening" Cursor="Hand">
+             <Border.ContextMenu><ContextMenu/></Border.ContextMenu>
+             <Grid>
+              <Grid.ColumnDefinitions><ColumnDefinition Width="18"/><ColumnDefinition Width="30"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+              <TextBlock Text="{Binding IsExpanded,Converter={StaticResource ExpandArrow}}" Foreground="{StaticResource TextDimBrush}" VerticalAlignment="Center"/>
+              <Image Grid.Column="1" Width="22" Height="16" Source="{Binding CountryCode,Converter={StaticResource CountryFlag}}" Stretch="Uniform" HorizontalAlignment="Left"/>
+              <StackPanel Grid.Column="2">
+               <TextBlock Text="{Binding DisplayName}" FontSize="12.5" Foreground="{StaticResource TextBrush}" TextTrimming="CharacterEllipsis" ToolTip="{Binding DisplayName}"/>
+               <TextBlock Text="{Binding LocationText}" FontSize="10.5" Foreground="{StaticResource TextDimBrush}" Margin="0,3,0,0" TextTrimming="CharacterEllipsis"/>
+              </StackPanel>
+              <Button Grid.Column="3" Content="Block" Style="{StaticResource GhostButton}" FontSize="10.5" Padding="7,3" Margin="6,0" Click="BlockDestination_Click" ToolTip="Block this destination's resolved IPs for this app. Sites sharing those IPs can also be affected." Visibility="{Binding IsIpGroup,Converter={StaticResource InvBoolVis}}"/>
+              <TextBlock Grid.Column="4" Text="{Binding StatusText}" FontSize="10.5" Foreground="{StaticResource TextDimBrush}" VerticalAlignment="Center"/>
+             </Grid>
+            </Border>
+            <ItemsControl ItemsSource="{Binding Flows}" Visibility="{Binding IsExpanded,Converter={StaticResource BoolVis}}">
+             <ItemsControl.ItemTemplate>
+              <DataTemplate DataType="{x:Type m:NetworkFlow}">
+               <Border x:Name="FlowBorder" Padding="88,6,12,6" Background="{StaticResource SurfaceBrush}" ContextMenuOpening="Row_ContextMenuOpening" MouseLeftButtonDown="FlowRow_Click">
+                <Border.ContextMenu><ContextMenu/></Border.ContextMenu>
+                <Grid>
+                 <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                 <StackPanel>
+                  <TextBlock Text="{Binding Details}" Foreground="{StaticResource TextBrush}" FontSize="11" TextTrimming="CharacterEllipsis" ToolTip="{Binding Details}"/>
+                  <StackPanel Orientation="Horizontal" Margin="0,3,0,0">
+                   <Image Source="{Binding CountryCode,Converter={StaticResource CountryFlag}}" Width="20" Height="14" Stretch="Uniform" Margin="0,0,6,0"/>
+                   <TextBlock Text="{Binding LocationText}" FontSize="10.5" Foreground="{StaticResource TextDimBrush}" TextTrimming="CharacterEllipsis"/>
+                  </StackPanel>
+                 </StackPanel>
+                 <TextBlock Grid.Column="1" Text="{Binding StatusText}" Margin="8,0,0,0" Foreground="{Binding IsBlocked,Converter={StaticResource BlockColor}}" FontSize="10.5" VerticalAlignment="Center"/>
+                </Grid>
+               </Border>
+               <DataTemplate.Triggers><DataTrigger Binding="{Binding IsSelected}" Value="True"><Setter TargetName="FlowBorder" Property="Background" Value="#594020"/></DataTrigger></DataTemplate.Triggers>
+              </DataTemplate>
+             </ItemsControl.ItemTemplate>
+            </ItemsControl>
+           </StackPanel>
+           <DataTemplate.Triggers><DataTrigger Binding="{Binding IsSelected}" Value="True"><Setter TargetName="DestBorder" Property="Background" Value="#594020"/></DataTrigger></DataTemplate.Triggers>
+          </DataTemplate>
+         </ItemsControl.ItemTemplate>
+        </ItemsControl>
+       </StackPanel>
+      </Border>
+      <DataTemplate.Triggers><DataTrigger Binding="{Binding IsHighlighted}" Value="True"><Setter TargetName="AppBorder" Property="BorderBrush" Value="#4ADE80"/></DataTrigger></DataTemplate.Triggers>
+     </DataTemplate>
+    </ItemsControl.ItemTemplate>
+   </ItemsControl>
+  </ScrollViewer>
+ </Grid>
+</UserControl>

@@ -1,0 +1,156 @@
+<Window x:Class="EShield.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:ui="http://schemas.modernwpf.com/2019"
+        xmlns:pages="clr-namespace:EShield.Views.Pages"
+        ui:WindowHelper.UseModernWindowStyle="False"
+        Title="EShield" Icon="/EShield;component/Resources/shield.ico" WindowStyle="None"
+        AllowsTransparency="False"
+        Width="650" Height="760" MinWidth="520" MinHeight="500" MaxWidth="1100"
+        Background="{StaticResource BgBrush}"
+        WindowStartupLocation="CenterScreen"
+        Closing="Window_Closing"
+        ResizeMode="CanResizeWithGrip">
+
+  <WindowChrome.WindowChrome>
+    <WindowChrome CornerRadius="12" GlassFrameThickness="0"
+                  ResizeBorderThickness="6" CaptionHeight="44"/>
+  </WindowChrome.WindowChrome>
+
+  <Border Background="{StaticResource BgBrush}" BorderBrush="{StaticResource BorderBrush}"
+          BorderThickness="1" CornerRadius="12">
+    <Grid>
+      <Grid.RowDefinitions>
+        <RowDefinition Height="Auto"/>  <!-- custom title bar -->
+        <RowDefinition Height="Auto"/>  <!-- search bar -->
+        <RowDefinition Height="Auto"/>  <!-- filter pills -->
+        <RowDefinition Height="*"/>     <!-- connection list (main page) -->
+        <RowDefinition Height="Auto"/>
+      </Grid.RowDefinitions>
+
+      <!-- ── Title bar — CaptionHeight=44 makes the whole bar draggable;
+               every interactive child needs IsHitTestVisibleInChrome=True ──── -->
+      <Grid Grid.Row="0" Height="44" Margin="14,0"
+            Background="Transparent">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="Auto"/>
+          <ColumnDefinition Width="*"/>
+          <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Traffic lights — must be hit-test visible so clicks still work -->
+        <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center"
+                    WindowChrome.IsHitTestVisibleInChrome="True">
+          <Ellipse Style="{StaticResource TLClose}" Cursor="Hand" MouseLeftButtonDown="Close_Click"/>
+          <Ellipse Style="{StaticResource TLMin}"   Cursor="Hand" MouseLeftButtonDown="Minimize_Click"/>
+          <Ellipse Style="{StaticResource TLMax}"   Cursor="Hand" MouseLeftButtonDown="Maximize_Click"/>
+        </StackPanel>
+
+        <!-- Title centred (non-interactive — acts as drag handle automatically) -->
+        <TextBlock Grid.Column="1" Text="EShield" FontSize="14" FontWeight="SemiBold"
+                   Foreground="{StaticResource TextBrush}"
+                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
+
+        <!-- Right controls — must be hit-test visible so clicks still work -->
+        <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center"
+                    WindowChrome.IsHitTestVisibleInChrome="True">
+          <!-- Block List -->
+          <Button Style="{StaticResource IconButton}" ToolTip="Block List"
+                  Click="BlockList_Click">
+            <TextBlock Text="🚫" FontSize="14"/>
+          </Button>
+          <!-- Allow List -->
+          <Button Style="{StaticResource IconButton}" ToolTip="Allow List" Margin="2,0"
+                  Click="AllowList_Click">
+            <TextBlock Text="✅" FontSize="14"/>
+          </Button>
+          <!-- Map -->
+          <Button Style="{StaticResource IconButton}" ToolTip="GeoIP Connection Map" Margin="2,0"
+                  Click="Map_Click">
+            <TextBlock Text="🗺" FontSize="14"/>
+          </Button>
+          <!-- Settings -->
+          <Button Style="{StaticResource IconButton}" ToolTip="Settings (Ctrl+,)" Margin="2,0"
+                  Click="Settings_Click">
+            <TextBlock Text="⚙" FontSize="14"/>
+          </Button>
+          <!-- Mode pill -->
+          <Button x:Name="ModePill" Style="{StaticResource ModePillButton}"
+                  Margin="8,0,0,0" Click="ModePill_Click"
+                  ToolTip="Click to change connection mode">
+            <StackPanel Orientation="Horizontal">
+              <Ellipse Width="7" Height="7" Fill="White" Opacity="0.8"
+                       VerticalAlignment="Center" Margin="0,0,5,0"/>
+              <TextBlock x:Name="ModePillText" Text="Allow" FontSize="12"
+                         FontWeight="SemiBold" Foreground="White"/>
+              <TextBlock Text=" ▾" FontSize="10" Foreground="White" Opacity="0.7"
+                         VerticalAlignment="Center"/>
+            </StackPanel>
+          </Button>
+        </StackPanel>
+      </Grid>
+
+      <!-- ── Search bar ──────────────────────────────────────────────── -->
+      <Border Grid.Row="1" Margin="12,0,12,8" Background="{StaticResource Surface2Brush}"
+              BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="8">
+        <Grid>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
+          </Grid.ColumnDefinitions>
+          <TextBlock Text="🔍" FontSize="12" Margin="10,0,4,0" VerticalAlignment="Center"
+                     Foreground="{StaticResource TextDimBrush}"/>
+          <TextBox x:Name="SearchBox" Grid.Column="1"
+                   Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+                   BorderThickness="0" Background="Transparent"
+                   Foreground="{StaticResource TextBrush}" CaretBrush="{StaticResource AccentBrush}"
+                   FontSize="12.5" Padding="0,8"
+                   ui:ControlHelper.PlaceholderText="Filter processes, domains (Ctrl+F)"/>
+          <!-- Time range button -->
+          <Button x:Name="TimeRangeBtn" Grid.Column="2" Style="{StaticResource IconButton}"
+                  Width="Auto" Padding="6,0" Margin="4,0" Click="TimeRange_Click">
+            <StackPanel Orientation="Horizontal">
+              <TextBlock Text="⏱" FontSize="11" VerticalAlignment="Center" Margin="0,0,3,0"
+                         Foreground="{StaticResource TextDimBrush}"/>
+              <TextBlock x:Name="TimeRangeText" Text="5m" FontSize="11" FontWeight="SemiBold"
+                         Foreground="{StaticResource TextDimBrush}" VerticalAlignment="Center"/>
+            </StackPanel>
+          </Button>
+        </Grid>
+      </Border>
+
+      <!-- ── Filter pills ──────────────────────────────────────────────── -->
+      <DockPanel Grid.Row="2" Margin="12,0,12,6">
+       <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+        <Button Style="{StaticResource GhostButton}" Content="Sort" FontSize="11" Padding="8,4" Margin="4,0"
+                ToolTip="Switch between recent and alphabetical order" Command="{Binding ToggleSortModeCommand}"/>
+        <Button Style="{StaticResource GhostButton}" Content="Clear activity" FontSize="11" Padding="8,4"
+                Command="{Binding ClearAllActivityCommand}"/>
+       </StackPanel>
+       <StackPanel Orientation="Horizontal">
+        <Button x:Name="PillAll" Style="{StaticResource GhostButton}" Padding="10,4"
+                Content="All" FontSize="11" Margin="0,0,4,0" Click="Filter_Click" Tag="All"/>
+        <Button x:Name="PillBlocked" Style="{StaticResource GhostButton}" Padding="10,4"
+                FontSize="11" Margin="0,0,4,0" Click="Filter_Click" Tag="Blocked">
+          <TextBlock Text="Blocked" Foreground="#FFEF4444"/>
+        </Button>
+        <Button x:Name="PillAllowed" Style="{StaticResource GhostButton}" Padding="10,4"
+                FontSize="11" Click="Filter_Click" Tag="Allowed">
+          <TextBlock Text="Allowed" Foreground="#FF22C55E"/>
+        </Button>
+      </StackPanel>
+      </DockPanel>
+
+      <!-- ── Connection list (fills remaining space) ────────────────────── -->
+      <pages:ConnectionsPage x:Name="PageConnections" Grid.Row="3" DataContext="{Binding}"/>
+      <Border Grid.Row="4" Padding="12,6" Background="{StaticResource SurfaceBrush}">
+        <StackPanel>
+          <TextBlock Text="{Binding BandwidthText}" FontSize="11" Foreground="{StaticResource TextBrush}"/>
+          <TextBlock Text="{Binding EngineStatus}" TextTrimming="CharacterEllipsis" ToolTip="{Binding EngineStatus}"
+                     FontSize="10" Foreground="{StaticResource TextDimBrush}" Margin="0,3,0,0"/>
+        </StackPanel>
+      </Border>
+    </Grid>
+  </Border>
+</Window>

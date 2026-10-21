@@ -1,0 +1,8 @@
+IP geolocation data: DB-IP Lite (downloaded separately during the build).
+https://db-ip.com/db/download/ip-to-city-lite
+Copyright DB-IP.com. Licensed under Creative Commons Attribution 4.0 International:
+https://creativecommons.org/licenses/by/4.0/
+Locations are approximate. Lookups run locally; no monitored IP addresses are sent to DB-IP.
+
+Country flag images: Flagpedia / flagcdn.com, downloaded once during the build
+and served locally at runtime. National flag designs are in the public domain.

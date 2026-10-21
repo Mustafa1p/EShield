@@ -1,0 +1,74 @@
+name: Windows
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+      - name: Database cache key
+        id: date
+        shell: pwsh
+        run: '"month=$([DateTime]::UtcNow.ToString(''yyyy-MM''))" >> $env:GITHUB_OUTPUT'
+      - uses: actions/cache@v4
+        with:
+          path: src/EShield.App/Data/*.mmdb
+          key: dbip-city-lite-${{ steps.date.outputs.month }}
+      - name: Download local GeoIP data
+        shell: pwsh
+        run: ./tools/fetch-geoip.ps1
+      - name: Regression checks
+        shell: pwsh
+        run: ./tools/test.ps1
+      - name: Publish Windows x64
+        shell: pwsh
+        run: |
+          $version = if ($env:GITHUB_REF_TYPE -eq 'tag') { $env:GITHUB_REF_NAME.TrimStart('v') } else { '0.1.0' }
+          ./tools/build.ps1 -SelfContained -Version $version
+      - name: Package application
+        shell: pwsh
+        run: |
+          $version = if ($env:GITHUB_REF_TYPE -eq 'tag') { $env:GITHUB_REF_NAME } else { 'preview' }
+          $name = "EShield-$version-win-x64.zip"
+          Compress-Archive -Path artifacts/app/* -DestinationPath "artifacts/$name"
+          $hash = (Get-FileHash "artifacts/$name" -Algorithm SHA256).Hash.ToLowerInvariant()
+          "$hash  $name" | Set-Content artifacts/SHA256SUMS.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: EShield-win-x64
+          path: |
+            artifacts/*.zip
+            artifacts/SHA256SUMS.txt
+          retention-days: 14
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: EShield-win-x64
+          path: release
+      - name: Publish GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          gh release create "$RELEASE_TAG" release/*.zip release/SHA256SUMS.txt \
+            --title "EShield $RELEASE_TAG — Windows" \
+            --notes-file .github/release-notes.md

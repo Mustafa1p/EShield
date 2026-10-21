@@ -1,0 +1,12 @@
+<Window x:Class="EShield.Views.ApprovalWindow"
+ xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+ xmlns:ui="http://schemas.modernwpf.com/2019"
+ xmlns:pages="clr-namespace:EShield.Views.Pages"
+ ui:WindowHelper.UseModernWindowStyle="True"
+ Title="Connection Approval — EShield" Icon="/EShield;component/Resources/shield.ico"
+ Width="560" Height="690" MinWidth="480" MaxHeight="850"
+ Background="{StaticResource BgBrush}" WindowStartupLocation="CenterOwner"
+ Topmost="True" ShowInTaskbar="False" KeyDown="Window_KeyDown">
+ <ScrollViewer VerticalScrollBarVisibility="Auto"><pages:ApprovalPanelView DataContext="{Binding}"/></ScrollViewer>
+</Window>

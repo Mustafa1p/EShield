@@ -1,0 +1,120 @@
+<Window x:Class="EShield.Views.SettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:ui="http://schemas.modernwpf.com/2019"
+        ui:WindowHelper.UseModernWindowStyle="True"
+        Title="Settings — EShield" Width="520" SizeToContent="Height"
+        Background="{StaticResource BgBrush}" WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize">
+  <ScrollViewer Margin="16" MaxHeight="640">
+    <StackPanel MaxWidth="480">
+      <TextBlock Text="Settings" FontSize="18" FontWeight="Bold"
+                 Foreground="{StaticResource TextBrush}" Margin="0,0,0,16"/>
+
+      <!-- Connection Mode -->
+      <Border Style="{StaticResource Card}" Margin="0,0,0,10">
+        <StackPanel>
+          <TextBlock Text="Connection Mode" FontSize="13" FontWeight="SemiBold"
+                     Foreground="{StaticResource TextBrush}" Margin="0,0,0,12"/>
+          <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+            <Button Style="{StaticResource SuccessButton}" Content="⚡ Allow All"
+                    Margin="0,0,8,0" Padding="14,7" Click="SetAllowAll_Click"/>
+            <Button Style="{StaticResource GhostButton}" Content="⏳ Require Approval"
+                    Margin="0,0,8,0" Foreground="#FFF59E0B" Click="SetRequireApproval_Click"/>
+            <Button Style="{StaticResource DangerButton}" Content="🚫 Block All"
+                    Click="SetBlockAll_Click"/>
+          </StackPanel>
+          <TextBlock FontSize="11" Foreground="{StaticResource TextDimBrush}" TextWrapping="Wrap">
+            <Run Text="Current: "/>
+            <Run Text="{Binding ConnectionMode, Converter={StaticResource ModeStr}}"
+                 Foreground="{Binding ConnectionMode, Converter={StaticResource ModeColor}}"/>
+          </TextBlock>
+        </StackPanel>
+      </Border>
+
+      <!-- General -->
+      <Border Style="{StaticResource Card}" Margin="0,0,0,10">
+        <StackPanel>
+          <TextBlock Text="General" FontSize="13" FontWeight="SemiBold"
+                     Foreground="{StaticResource TextBrush}" Margin="0,0,0,12"/>
+
+          <Grid Margin="0,4">
+            <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+            <StackPanel>
+              <TextBlock Text="Allow DNS Traffic (UDP 53)" FontSize="12.5" Foreground="{StaticResource TextBrush}"/>
+              <TextBlock Text="Permit UDP DNS in strict modes; explicit blocks still apply"
+                         TextWrapping="Wrap" MaxWidth="380" FontSize="10.5" Foreground="{StaticResource TextDimBrush}"/>
+            </StackPanel>
+            <CheckBox Grid.Column="1" IsChecked="{Binding Settings.Settings.AllowDnsTraffic}"
+                      VerticalAlignment="Center" Click="Save_Click"/>
+          </Grid>
+
+          <Separator Background="{StaticResource BorderBrush}" Margin="0,8"/>
+
+          <Grid Margin="0,4">
+            <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+            <StackPanel>
+              <TextBlock Text="Minimize to Tray on Close" FontSize="12.5" Foreground="{StaticResource TextBrush}"/>
+              <TextBlock Text="Keep monitoring in the system tray"
+                         FontSize="10.5" Foreground="{StaticResource TextDimBrush}"/>
+            </StackPanel>
+            <CheckBox Grid.Column="1" IsChecked="{Binding Settings.Settings.MinimizeToTrayOnClose}"
+                      VerticalAlignment="Center" Click="Save_Click"/>
+          </Grid>
+
+          <Separator Background="{StaticResource BorderBrush}" Margin="0,8"/>
+
+          <Grid Margin="0,4">
+            <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+            <StackPanel>
+              <TextBlock Text="Launch at Startup" FontSize="12.5" Foreground="{StaticResource TextBrush}"/>
+              <TextBlock Text="Start EShield automatically when Windows boots"
+                         FontSize="10.5" Foreground="{StaticResource TextDimBrush}"/>
+            </StackPanel>
+            <CheckBox Grid.Column="1" IsChecked="{Binding Settings.Settings.LaunchAtStartup}"
+                      VerticalAlignment="Center" Click="Startup_Click"/>
+          </Grid>
+
+          <Separator Background="{StaticResource BorderBrush}" Margin="0,8"/>
+
+          <Grid Margin="0,4">
+            <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+            <StackPanel>
+              <TextBlock Text="Allow System Processes" FontSize="12.5" Foreground="{StaticResource TextBrush}"/>
+              <TextBlock Text="Allow verified Microsoft-signed Windows programs in strict modes; explicit blocks still apply"
+                         TextWrapping="Wrap" MaxWidth="380" FontSize="10.5" Foreground="{StaticResource TextDimBrush}"/>
+            </StackPanel>
+            <CheckBox Grid.Column="1" IsChecked="{Binding Settings.Settings.AllowSystemProcesses}"
+                      VerticalAlignment="Center" Click="Save_Click"/>
+          </Grid>
+        </StackPanel>
+      </Border>
+
+      <!-- About -->
+      <Border Style="{StaticResource Card}">
+        <StackPanel>
+          <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+            <Border Width="36" Height="36" CornerRadius="8"
+                    Background="{StaticResource AccentBrush}" Margin="0,0,12,0">
+              <Image Source="/EShield;component/Resources/shield.ico" Width="28" Height="28"
+                     HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Border>
+            <StackPanel VerticalAlignment="Center">
+              <TextBlock Text="EShield" FontSize="15" FontWeight="Bold" Foreground="{StaticResource TextBrush}"/>
+              <TextBlock Text="Advanced Network Control for Windows"
+                         FontSize="10.5" Foreground="{StaticResource TextDimBrush}"/>
+            </StackPanel>
+          </StackPanel>
+
+          <TextBlock FontSize="11.5" Foreground="{StaticResource TextDimBrush}" LineHeight="20">
+            <Run Text="Version 0.1.0 · Open source"/><LineBreak/>
+            <Run Text="Real-time network monitoring and control"/><LineBreak/>
+            <Run Text="Powered by Windows Filtering Platform"/>
+          </TextBlock>
+          <TextBlock Text="IP Geolocation by DB-IP · local DB-IP Lite database (CC BY 4.0). Locations are approximate."
+                     FontSize="10.5" TextWrapping="Wrap" Foreground="{StaticResource TextDimBrush}" Margin="0,8,0,0"/>
+        </StackPanel>
+      </Border>
+    </StackPanel>
+  </ScrollViewer>
+</Window>

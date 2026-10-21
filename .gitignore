@@ -1,0 +1,39 @@
+# Generated .NET / native output
+**/bin/
+**/obj/
+build/
+artifacts/
+.vs/
+*.user
+*.suo
+*.pdb
+*.obj
+*.lib
+*.exp
+
+# Downloaded databases: fetched by tools/fetch-geoip.ps1
+*.mmdb
+*.mmdb.gz
+src/EShield.App/Data/geoip-release.json
+
+# Local state and private material
+*.db
+*.db-shm
+*.db-wal
+*.sqlite*
+*.log
+runtime-status.json
+settings.json
+.env
+.env.*
+!.env.example
+*.pfx
+*.p12
+*.pem
+*.key
+**/*.WebView2/
+**/webview2/
+.codex/
+.idea/
+.DS_Store
+Thumbs.db
