@@ -4,7 +4,7 @@
 
 <h1 align="center">EShield</h1>
 
-<p align="center"><strong>A small, open-source take on TinyShield — built for Windows.</strong></p>
+<p align="center"><strong>A smaller TinyShield for Windows — open source.</strong></p>
 
 <p align="center">
   <a href="https://github.com/Mustafa1p/EShield/actions/workflows/windows.yml"><img src="https://github.com/Mustafa1p/EShield/actions/workflows/windows.yml/badge.svg" alt="Windows build"></a>
@@ -35,7 +35,7 @@ See which apps connect to the internet, explore their destinations, and block an
 | Bandwidth | View per-app transfer totals and recent traffic samples. |
 | Local state | Store rules, settings, and bandwidth records on the device. Resolve GeoIP locations from a bundled local database. |
 
-No account, subscription, license key, or GeoIP API key is required. This is an independent, early-stage project inspired by [TinyShield](https://tinyshield.proxyman.com/), with no affiliation or endorsement from TinyShield or Proxyman.
+No account, subscription, license key, or GeoIP API key is required.
 
 ## Get started
 
