@@ -4,7 +4,7 @@
 
 <h1 align="center">EShield</h1>
 
-<p align="center"><strong>A smaller TinyShield for Windows — open source.</strong></p>
+<p align="center"><strong>A smaller TinyShield for Windows — free and open source, with no paid tiers or feature limits.</strong></p>
 
 <p align="center">
   <a href="https://github.com/Mustafa1p/EShield/actions/workflows/windows.yml"><img src="https://github.com/Mustafa1p/EShield/actions/workflows/windows.yml/badge.svg" alt="Windows build"></a>
